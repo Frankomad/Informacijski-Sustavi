@@ -1,0 +1,35 @@
+{
+  "name": "digital-ledger-dashboard-backend",
+  "version": "1.0.0",
+  "description": "Backend for Digital Ledger Dashboard",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node dist/index.js",
+    "dev": "tsc -w & nodemon dist/index.js",
+    "build": "tsc",
+    "type-check": "tsc --noEmit",
+    "test": "cd . && node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:watch": "cd . && node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
+    "test:coverage": "cd . && node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.3",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.11.24",
+    "nodemon": "^3.1.0",
+    "typescript": "^5.3.3",
+    "@types/jest": "^29.5.12",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2",
+    "supertest": "^6.3.4",
+    "@types/supertest": "^6.0.2"
+  }
+}
