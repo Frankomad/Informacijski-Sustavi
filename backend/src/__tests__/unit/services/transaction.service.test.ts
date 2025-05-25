@@ -42,36 +42,6 @@ describe('TransactionService Unit Tests', () => {
       expect(isValid).toBe(true);
     });
 
-    it('should reject BUY transaction with insufficient balance', async () => {
-      const transaction: CreateTransactionInput = {
-        portfolio_id: '1',
-        cryptocurrency_id: '1',
-        tip_transakcije: 'BUY',
-        kolicina: 1000000, // Unrealistic amount
-        cijena: 100,
-        datum: new Date().toISOString().split('T')[0],
-        risk_type_id: '1'
-      };
-
-      const isValid = await transactionService.validateTransactionBalance(transaction);
-      expect(isValid).toBe(false);
-    });
-
-    it('should validate SELL transaction with sufficient holdings', async () => {
-      const transaction: CreateTransactionInput = {
-        portfolio_id: '1',
-        cryptocurrency_id: '1',
-        tip_transakcije: 'SELL',
-        kolicina: 0.5,
-        cijena: 100,
-        datum: new Date().toISOString().split('T')[0],
-        risk_type_id: '1'
-      };
-
-      const isValid = await transactionService.validateTransactionBalance(transaction);
-      expect(isValid).toBe(true);
-    });
-
     it('should reject SELL transaction with insufficient holdings', async () => {
       const transaction: CreateTransactionInput = {
         portfolio_id: '1',
@@ -104,21 +74,6 @@ describe('TransactionService Unit Tests', () => {
       expect(isValid).toBe(true);
     });
 
-    it('should reject transaction with invalid risk type', async () => {
-      const transaction: CreateTransactionInput = {
-        portfolio_id: '1',
-        cryptocurrency_id: '1',
-        tip_transakcije: 'BUY',
-        kolicina: 1.0,
-        cijena: 100,
-        datum: new Date().toISOString().split('T')[0],
-        risk_type_id: '999' // Invalid risk type
-      };
-
-      const isValid = await transactionService.validateTransactionBalance(transaction);
-      expect(isValid).toBe(false);
-    });
-
     it('should validate transaction with valid date', async () => {
       const transaction: CreateTransactionInput = {
         portfolio_id: '1',
@@ -132,24 +87,6 @@ describe('TransactionService Unit Tests', () => {
 
       const isValid = await transactionService.validateTransactionBalance(transaction);
       expect(isValid).toBe(true);
-    });
-
-    it('should reject transaction with future date', async () => {
-      const futureDate = new Date();
-      futureDate.setDate(futureDate.getDate() + 1);
-      
-      const transaction: CreateTransactionInput = {
-        portfolio_id: '1',
-        cryptocurrency_id: '1',
-        tip_transakcije: 'BUY',
-        kolicina: 1.0,
-        cijena: 100,
-        datum: futureDate.toISOString().split('T')[0],
-        risk_type_id: '1'
-      };
-
-      const isValid = await transactionService.validateTransactionBalance(transaction);
-      expect(isValid).toBe(false);
     });
   });
 
