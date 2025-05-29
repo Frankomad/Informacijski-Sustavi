@@ -1,12 +1,14 @@
 import { Request, Response } from 'express';
 import { RiskTypeRepository } from '../repositories/riskTypeRepository.js';
+import { AuthenticatedRequest } from '../middleware/authMiddleware.js';
 
 const riskTypeRepository = new RiskTypeRepository();
 
 // Get all risk types
-export const getRiskTypes = async (_req: Request, res: Response) => {
+export const getRiskTypes = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const riskTypes = await riskTypeRepository.findAll();
+    const userId = req.user?.id;
+    const riskTypes = await riskTypeRepository.findAllByUser(userId!);
     res.json(riskTypes);
   } catch (error) {
     console.error('Error fetching risk types:', error);
@@ -15,9 +17,10 @@ export const getRiskTypes = async (_req: Request, res: Response) => {
 };
 
 // Create a new risk type
-export const createRiskType = async (req: Request, res: Response) => {
+export const createRiskType = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const riskType = await riskTypeRepository.create(req.body);
+    const userId = req.user?.id;
+    const riskType = await riskTypeRepository.create({ ...req.body, user_id: userId });
     res.status(201).json(riskType);
   } catch (error) {
     console.error('Error creating risk type:', error);
@@ -30,10 +33,11 @@ export const createRiskType = async (req: Request, res: Response) => {
 };
 
 // Delete a risk type
-export const deleteRiskType = async (req: Request, res: Response) => {
+export const deleteRiskType = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { id } = req.params;
-    await riskTypeRepository.delete(id);
+    const userId = req.user?.id;
+    await riskTypeRepository.deleteByUser(id, userId!);
     res.status(204).send();
   } catch (error) {
     console.error('Error deleting risk type:', error);
@@ -46,10 +50,11 @@ export const deleteRiskType = async (req: Request, res: Response) => {
 };
 
 // Update a risk type
-export const updateRiskType = async (req: Request, res: Response) => {
+export const updateRiskType = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const riskType = await riskTypeRepository.update(id, req.body);
+    const userId = req.user?.id;
+    const riskType = await riskTypeRepository.updateByUser(id, req.body, userId!);
     res.status(200).json(riskType);
   } catch (error) {
     console.error('Error updating risk type:', error);
@@ -62,10 +67,11 @@ export const updateRiskType = async (req: Request, res: Response) => {
 };
 
 // Get a single risk type by id
-export const getRiskTypeById = async (req: Request, res: Response) => {
+export const getRiskTypeById = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const riskType = await riskTypeRepository.findById(id);
+    const userId = req.user?.id;
+    const riskType = await riskTypeRepository.findByIdAndUser(id, userId!);
     res.json(riskType);
   } catch (error) {
     console.error('Error fetching risk type:', error);

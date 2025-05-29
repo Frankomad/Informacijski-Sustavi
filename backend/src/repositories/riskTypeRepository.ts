@@ -65,4 +65,56 @@ export class RiskTypeRepository {
       throw error;
     }
   }
+
+  async findAllByUser(userId: string) {
+    const { data, error } = await supabase
+      .from('risk_types')
+      .select('*')
+      .eq('user_id', userId)
+      .order('name', { ascending: true });
+
+    if (error) throw error;
+    return riskTypeResponseSchema.array().parse(data);
+  }
+
+  async findByIdAndUser(id: string, userId: string) {
+    const { data, error } = await supabase
+      .from('risk_types')
+      .select('*')
+      .eq('id', id)
+      .eq('user_id', userId)
+      .single();
+    if (error) throw error;
+    return riskTypeResponseSchema.parse(data);
+  }
+
+  async updateByUser(id: string, riskTypeData: Partial<RiskType>, userId: string) {
+    const validatedData = riskTypeSchema.partial().parse(riskTypeData);
+    const { data, error } = await supabase
+      .from('risk_types')
+      .update(validatedData)
+      .eq('id', id)
+      .eq('user_id', userId)
+      .select()
+      .single();
+    if (error) throw error;
+    return riskTypeResponseSchema.parse(data);
+  }
+
+  async deleteByUser(id: string, userId: string) {
+    const { error } = await supabase
+      .from('risk_types')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', userId);
+    if (error) {
+      if (
+        error.code === '23503' ||
+        (error.details && error.details.includes('violates foreign key constraint'))
+      ) {
+        throw new Error('Cannot delete risk type: it is used in one or more transactions.');
+      }
+      throw error;
+    }
+  }
 } 

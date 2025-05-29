@@ -1,13 +1,6 @@
+import { fetchWithAuth } from './fetchWithAuth';
+
 const API_BASE_URL = 'http://localhost:3001/api';
-
-// Helper functions to map between frontend and backend transaction types
-const mapToBackendType = (type: 'LONG' | 'SHORT'): 'BUY' | 'SELL' => {
-  return type === 'LONG' ? 'BUY' : 'SELL';
-};
-
-const mapToFrontendType = (type: 'BUY' | 'SELL'): 'LONG' | 'SHORT' => {
-  return type === 'BUY' ? 'LONG' : 'SHORT';
-};
 
 interface BackendTransaction {
   id: string;
@@ -52,12 +45,12 @@ export const api = {
   // Portfolio endpoints
   portfolios: {
     getAll: async () => {
-      const response = await fetch(`${API_BASE_URL}/portfolios`);
+      const response = await fetchWithAuth(`${API_BASE_URL}/portfolios`);
       if (!response.ok) throw new Error('Failed to fetch portfolios');
       return response.json();
     },
     create: async (data: { naziv: string; strategija?: string }) => {
-      const response = await fetch(`${API_BASE_URL}/portfolios`, {
+      const response = await fetchWithAuth(`${API_BASE_URL}/portfolios`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
@@ -66,13 +59,13 @@ export const api = {
       return response.json();
     },
     delete: async (id: string) => {
-      const response = await fetch(`${API_BASE_URL}/portfolios/${id}`, {
+      const response = await fetchWithAuth(`${API_BASE_URL}/portfolios/${id}`, {
         method: 'DELETE',
       });
       if (!response.ok) throw new Error('Failed to delete portfolio');
     },
     update: async (id: string, data: Partial<{ naziv: string; strategija?: string }>) => {
-      const response = await fetch(`${API_BASE_URL}/portfolios/${id}`, {
+      const response = await fetchWithAuth(`${API_BASE_URL}/portfolios/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
@@ -88,14 +81,9 @@ export const api = {
       const url = portfolioId
         ? `${API_BASE_URL}/transactions?portfolioId=${portfolioId}`
         : `${API_BASE_URL}/transactions`;
-      const response = await fetch(url);
+      const response = await fetchWithAuth(url);
       if (!response.ok) throw new Error('Failed to fetch transactions');
-      const data = await response.json() as BackendTransaction[];
-      // Map backend BUY/SELL to frontend LONG/SHORT
-      return data.map((transaction) => ({
-        ...transaction,
-        tip_transakcije: mapToFrontendType(transaction.tip_transakcije)
-      }));
+      return response.json();
     },
     create: async (data: {
       portfolio_id: string;
@@ -106,26 +94,16 @@ export const api = {
       datum: string;
       risk_type_id: string;
     }) => {
-      // Map frontend LONG/SHORT to backend BUY/SELL
-      const backendData = {
-        ...data,
-        tip_transakcije: mapToBackendType(data.tip_transakcije)
-      };
-      const response = await fetch(`${API_BASE_URL}/transactions`, {
+      const response = await fetchWithAuth(`${API_BASE_URL}/transactions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(backendData),
+        body: JSON.stringify(data),
       });
       if (!response.ok) throw new Error('Failed to create position');
-      const responseData = await response.json() as BackendTransaction;
-      // Map response back to frontend format
-      return {
-        ...responseData,
-        tip_transakcije: mapToFrontendType(responseData.tip_transakcije)
-      };
+      return response.json();
     },
     delete: async (id: string) => {
-      const response = await fetch(`${API_BASE_URL}/transactions/${id}`, {
+      const response = await fetchWithAuth(`${API_BASE_URL}/transactions/${id}`, {
         method: 'DELETE',
       });
       if (!response.ok) throw new Error('Failed to delete position');
@@ -139,30 +117,20 @@ export const api = {
       datum: string;
       risk_type_id: string;
     }>) => {
-      // Map frontend LONG/SHORT to backend BUY/SELL if tip_transakcije is present
-      const backendData = {
-        ...data,
-        ...(data.tip_transakcije && { tip_transakcije: mapToBackendType(data.tip_transakcije) })
-      };
-      const response = await fetch(`${API_BASE_URL}/transactions/${id}`, {
+      const response = await fetchWithAuth(`${API_BASE_URL}/transactions/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(backendData),
+        body: JSON.stringify(data),
       });
       if (!response.ok) throw new Error('Failed to update position');
-      const responseData = await response.json() as BackendTransaction;
-      // Map response back to frontend format
-      return {
-        ...responseData,
-        tip_transakcije: mapToFrontendType(responseData.tip_transakcije)
-      };
+      return response.json();
     },
   },
 
   // Cryptocurrency endpoints
   cryptocurrencies: {
     getAll: async () => {
-      const response = await fetch(`${API_BASE_URL}/cryptocurrencies`);
+      const response = await fetchWithAuth(`${API_BASE_URL}/cryptocurrencies`);
       if (!response.ok) throw new Error('Failed to fetch cryptocurrencies');
       return response.json();
     },
@@ -171,12 +139,12 @@ export const api = {
   // Risk type endpoints
   riskTypes: {
     getAll: async () => {
-      const response = await fetch(`${API_BASE_URL}/risk-types`);
+      const response = await fetchWithAuth(`${API_BASE_URL}/risk-types`);
       if (!response.ok) throw new Error('Failed to fetch risk types');
       return response.json();
     },
     create: async (data: { name: string; description?: string; color?: string }) => {
-      const response = await fetch(`${API_BASE_URL}/risk-types`, {
+      const response = await fetchWithAuth(`${API_BASE_URL}/risk-types`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
@@ -185,13 +153,13 @@ export const api = {
       return response.json();
     },
     delete: async (id: string) => {
-      const response = await fetch(`${API_BASE_URL}/risk-types/${id}`, {
+      const response = await fetchWithAuth(`${API_BASE_URL}/risk-types/${id}`, {
         method: 'DELETE',
       });
       if (!response.ok) throw new Error('Failed to delete risk type');
     },
     update: async (id: string, data: Partial<{ name: string; description?: string; color?: string }>) => {
-      const response = await fetch(`${API_BASE_URL}/risk-types/${id}`, {
+      const response = await fetchWithAuth(`${API_BASE_URL}/risk-types/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),

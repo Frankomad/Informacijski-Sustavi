@@ -81,4 +81,68 @@ export class TransactionRepository {
 
     if (error) throw error;
   }
+
+  async findAllByUser(userId: string, portfolioId?: string) {
+    let query = supabase
+      .from('transactions')
+      .select(`
+        *,
+        portfolio:portfolios(*),
+        cryptocurrency:cryptocurrencies(*),
+        risk_type:risk_types(*)
+      `)
+      .eq('user_id', userId)
+      .order('datum', { ascending: false });
+
+    if (portfolioId) {
+      query = query.eq('portfolio_id', portfolioId);
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+    return transactionResponseSchema.array().parse(data);
+  }
+
+  async findByIdAndUser(id: string, userId: string) {
+    const { data, error } = await supabase
+      .from('transactions')
+      .select(`
+        *,
+        portfolio:portfolios(*),
+        cryptocurrency:cryptocurrencies(*),
+        risk_type:risk_types(*)
+      `)
+      .eq('id', id)
+      .eq('user_id', userId)
+      .single();
+    if (error) throw error;
+    return transactionResponseSchema.parse(data);
+  }
+
+  async updateByUser(id: string, transactionData: Partial<Transaction>, userId: string) {
+    const validatedData = transactionSchema.partial().parse(transactionData);
+    const { data, error } = await supabase
+      .from('transactions')
+      .update(validatedData)
+      .eq('id', id)
+      .eq('user_id', userId)
+      .select(`
+        *,
+        portfolio:portfolios(*),
+        cryptocurrency:cryptocurrencies(*),
+        risk_type:risk_types(*)
+      `)
+      .single();
+    if (error) throw error;
+    return transactionResponseSchema.parse(data);
+  }
+
+  async deleteByUser(id: string, userId: string) {
+    const { error } = await supabase
+      .from('transactions')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', userId);
+    if (error) throw error;
+  }
 } 

@@ -4,6 +4,23 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "./ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
+
+// Helper za validaciju hex boje
+function isValidHex(color: string) {
+  return /^#([0-9A-Fa-f]{3}){1,2}$/.test(color);
+}
+
+// Helper za kontrast teksta
+function getContrastColor(hex: string) {
+  hex = hex.replace('#', '');
+  if (hex.length === 3) hex = hex.split('').map(x => x + x).join('');
+  const r = parseInt(hex.substr(0,2),16);
+  const g = parseInt(hex.substr(2,2),16);
+  const b = parseInt(hex.substr(4,2),16);
+  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+  return brightness > 128 ? '#222' : '#fff';
+}
 
 export default function RiskTypeManager() {
   const { riskTypes, createRiskType, deleteRiskType, editRiskType, isLoading } = useRiskTypes();
@@ -40,10 +57,16 @@ export default function RiskTypeManager() {
           onChange={e => setNewRiskType({ ...newRiskType, description: e.target.value })}
         />
         <Input
-          placeholder="Color (hex or name)"
+          placeholder="Color (hex, e.g. #ff0000)"
           value={newRiskType.color}
           onChange={e => setNewRiskType({ ...newRiskType, color: e.target.value })}
+          style={{
+            borderColor: newRiskType.color && !isValidHex(newRiskType.color) ? 'red' : undefined
+          }}
         />
+        {newRiskType.color && !isValidHex(newRiskType.color) && (
+          <div style={{ color: 'red', fontSize: 12 }}>Enter a valid hex color (e.g. #ff0000)</div>
+        )}
         <Button type="submit" disabled={createRiskType.isLoading}>Add</Button>
       </form>
       <Table>
@@ -61,7 +84,23 @@ export default function RiskTypeManager() {
               <TableCell>{rt.name}</TableCell>
               <TableCell>{rt.description}</TableCell>
               <TableCell>
-                <span style={{ background: rt.color, padding: "0.25em 0.75em", borderRadius: 4, color: "#fff" }}>{rt.color}</span>
+                {rt.color ? (
+                  <span
+                    style={{
+                      background: isValidHex(rt.color) ? rt.color : '#eee',
+                      color: isValidHex(rt.color) ? getContrastColor(rt.color) : '#222',
+                      padding: '0.25em 0.75em',
+                      borderRadius: 4,
+                      display: 'inline-block',
+                      minWidth: 60,
+                      textAlign: 'center',
+                    }}
+                  >
+                    {rt.color}
+                  </span>
+                ) : (
+                  <span style={{ color: '#888' }}>No color</span>
+                )}
               </TableCell>
               <TableCell>
                 <Button size="sm" variant="outline" onClick={() => setEditModal({ open: true, id: rt.id, data: { name: rt.name, description: rt.description, color: rt.color } })}>Edit</Button>
@@ -89,10 +128,16 @@ export default function RiskTypeManager() {
               onChange={e => setEditModal(v => ({ ...v, data: { ...v.data, description: e.target.value } }))}
             />
             <Input
-              placeholder="Color (hex or name)"
+              placeholder="Color (hex, e.g. #ff0000)"
               value={editModal.data.color || ""}
               onChange={e => setEditModal(v => ({ ...v, data: { ...v.data, color: e.target.value } }))}
+              style={{
+                borderColor: editModal.data.color && !isValidHex(editModal.data.color) ? 'red' : undefined
+              }}
             />
+            {editModal.data.color && !isValidHex(editModal.data.color) && (
+              <div style={{ color: 'red', fontSize: 12 }}>Enter a valid hex color (e.g. #ff0000)</div>
+            )}
             <DialogFooter>
               <Button type="submit" disabled={editRiskType.isLoading}>Save</Button>
               <DialogClose asChild>

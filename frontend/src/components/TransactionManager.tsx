@@ -14,6 +14,7 @@ import type { Transaction } from "@/types/database";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "./ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
 
 interface TransactionManagerProps {
   selectedPortfolioId: string | null;

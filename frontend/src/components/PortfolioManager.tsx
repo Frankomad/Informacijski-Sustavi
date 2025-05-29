@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Trash2, Plus, Briefcase, Edit2 } from "lucide-react";
 import PortfolioForm from "./PortfolioForm";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "./ui/dialog";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
 
 interface PortfolioManagerProps {
   onPortfolioSelect: (portfolioId: string | null) => void;

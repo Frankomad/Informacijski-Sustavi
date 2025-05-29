@@ -13,7 +13,7 @@ export const useLivePrices = () => {
   const [prices, setPrices] = useState<Record<string, PriceUpdate>>({});
   const [isConnected, setIsConnected] = useState(false);
   const lastUpdateTime = useRef<Record<string, number>>({});
-  const UPDATE_INTERVAL = 15000; // 15 seconds in milliseconds
+  const UPDATE_INTERVAL = 1500; // 1.5 seconds in milliseconds
 
   useEffect(() => {
     let ws: WebSocket | null = null;

@@ -12,6 +12,7 @@ export interface Transaction extends BaseModel {
   cijena: number;
   datum: string;
   risk_type_id: string | null;
+  user_id: string;
   portfolio?: Portfolio;
   cryptocurrency?: Cryptocurrency;
   risk_type?: RiskType;
@@ -25,6 +26,7 @@ export const transactionSchema = z.object({
   cijena: z.number().positive('Price must be positive'),
   datum: z.string().min(1, 'Date is required'),
   risk_type_id: z.string().nullable().optional(),
+  user_id: z.string().min(1, 'User ID is required'),
 });
 
 export type CreateTransactionInput = z.infer<typeof transactionSchema>;
@@ -40,6 +42,7 @@ export const transactionResponseSchema = z.object({
   risk_type_id: z.string().nullable(),
   created_at: z.string(),
   updated_at: z.string(),
+  user_id: z.string(),
   portfolio: z.object({
     id: z.string(),
     naziv: z.string(),
@@ -47,6 +50,7 @@ export const transactionResponseSchema = z.object({
     datum_kreiranja: z.string(),
     created_at: z.string(),
     updated_at: z.string(),
+    user_id: z.string(),
   }).optional(),
   cryptocurrency: z.object({
     id: z.string(),
