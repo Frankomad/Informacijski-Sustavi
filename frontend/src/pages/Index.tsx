@@ -4,16 +4,17 @@ import PortfolioManager from "@/components/PortfolioManager";
 import TransactionManager from "@/components/TransactionManager";
 import LivePriceTracker from "@/components/LivePriceTracker";
 import RiskTypeManager from "@/components/RiskTypeManager";
+import Statistics from "@/components/Statistics";
 
 const Index = () => {
   const [selectedPortfolioId, setSelectedPortfolioId] = useState<string | null>(null);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Cryptocurrency Portfolio Tracker</h1>
-          <p className="text-lg text-gray-600">Manage your investment portfolios and track real-time cryptocurrency prices</p>
+          <h1 className="text-4xl font-bold text-foreground mb-2">Cryptocurrency Portfolio Tracker</h1>
+          <p className="text-lg text-muted-foreground">Manage your investment portfolios and track real-time cryptocurrency prices</p>
         </div>
 
         <div className="mb-6">
@@ -21,25 +22,30 @@ const Index = () => {
         </div>
 
         <Tabs defaultValue="portfolios" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="portfolios">Portfolios</TabsTrigger>
-            <TabsTrigger value="transactions">Transactions</TabsTrigger>
-            <TabsTrigger value="risk-types">Risk Types</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-4 bg-muted/50">
+            <TabsTrigger value="portfolios" className="data-[state=active]:bg-background">Portfolios</TabsTrigger>
+            <TabsTrigger value="transactions" className="data-[state=active]:bg-background">Transactions</TabsTrigger>
+            <TabsTrigger value="risk-types" className="data-[state=active]:bg-background">Risk Types</TabsTrigger>
+            <TabsTrigger value="statistics" className="data-[state=active]:bg-background">Statistics</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="portfolios" className="space-y-6">
+          <TabsContent value="portfolios" className="space-y-6 mt-6">
             <PortfolioManager 
               onPortfolioSelect={setSelectedPortfolioId}
               selectedPortfolioId={selectedPortfolioId}
             />
           </TabsContent>
           
-          <TabsContent value="transactions" className="space-y-6">
+          <TabsContent value="transactions" className="space-y-6 mt-6">
             <TransactionManager selectedPortfolioId={selectedPortfolioId} />
           </TabsContent>
 
-          <TabsContent value="risk-types" className="space-y-6">
+          <TabsContent value="risk-types" className="space-y-6 mt-6">
             <RiskTypeManager />
+          </TabsContent>
+
+          <TabsContent value="statistics" className="space-y-6 mt-6">
+            <Statistics selectedPortfolioId={selectedPortfolioId} />
           </TabsContent>
         </Tabs>
       </div>

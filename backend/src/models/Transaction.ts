@@ -7,7 +7,7 @@ import { RiskType } from './RiskType.js';
 export interface Transaction extends BaseModel {
   portfolio_id: string;
   cryptocurrency_id: string;
-  tip_transakcije: 'buy' | 'sell';
+  tip_transakcije: 'LONG' | 'SHORT';
   kolicina: number;
   cijena: number;
   datum: string;
@@ -20,7 +20,7 @@ export interface Transaction extends BaseModel {
 export const transactionSchema = z.object({
   portfolio_id: z.string().min(1, 'Portfolio ID is required'),
   cryptocurrency_id: z.string().min(1, 'Cryptocurrency ID is required'),
-  tip_transakcije: z.enum(['BUY', 'SELL']),
+  tip_transakcije: z.enum(['LONG', 'SHORT']),
   kolicina: z.number().positive('Quantity must be positive'),
   cijena: z.number().positive('Price must be positive'),
   datum: z.string().min(1, 'Date is required'),
@@ -33,7 +33,7 @@ export const transactionResponseSchema = z.object({
   id: z.string(),
   portfolio_id: z.string(),
   cryptocurrency_id: z.string(),
-  tip_transakcije: z.enum(['BUY', 'SELL']),
+  tip_transakcije: z.enum(['LONG', 'SHORT']),
   kolicina: z.number(),
   cijena: z.number(),
   datum: z.string(),

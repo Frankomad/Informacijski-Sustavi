@@ -21,7 +21,7 @@ export const useTransactions = (portfolioId?: string | null) => {
     mutationFn: async (transaction: {
       portfolio_id: string;
       cryptocurrency_id: string;
-      tip_transakcije: 'BUY' | 'SELL';
+      tip_transakcije: 'LONG' | 'SHORT';
       kolicina: number;
       cijena: number;
       datum: string;
@@ -36,14 +36,14 @@ export const useTransactions = (portfolioId?: string | null) => {
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
       toast({
         title: "Success",
-        description: "Transaction created successfully",
+        description: "Position created successfully",
       });
     },
     onError: (error) => {
       console.error('Error in createTransaction mutation:', error);
       toast({
         title: "Error",
-        description: "Failed to create transaction",
+        description: "Failed to create position",
         variant: "destructive",
       });
     },
@@ -59,14 +59,14 @@ export const useTransactions = (portfolioId?: string | null) => {
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
       toast({
         title: "Success",
-        description: "Transaction deleted successfully",
+        description: "Position deleted successfully",
       });
     },
     onError: (error) => {
       console.error('Error in deleteTransaction mutation:', error);
       toast({
         title: "Error",
-        description: "Failed to delete transaction",
+        description: "Failed to delete position",
         variant: "destructive",
       });
     },
@@ -76,7 +76,7 @@ export const useTransactions = (portfolioId?: string | null) => {
     mutationFn: async ({ id, data }: { id: string; data: Partial<{
       portfolio_id: string;
       cryptocurrency_id: string;
-      tip_transakcije: 'BUY' | 'SELL';
+      tip_transakcije: 'LONG' | 'SHORT';
       kolicina: number;
       cijena: number;
       datum: string;
@@ -91,14 +91,14 @@ export const useTransactions = (portfolioId?: string | null) => {
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
       toast({
         title: 'Success',
-        description: 'Transaction updated successfully',
+        description: 'Position updated successfully',
       });
     },
     onError: (error) => {
       console.error('Error in editTransaction mutation:', error);
       toast({
         title: 'Error',
-        description: 'Failed to update transaction',
+        description: 'Failed to update position',
         variant: 'destructive',
       });
     },

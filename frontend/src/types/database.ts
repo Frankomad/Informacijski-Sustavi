@@ -31,7 +31,7 @@ export interface Transaction {
   id: string;
   portfolio_id: string;
   cryptocurrency_id: string;
-  tip_transakcije: 'BUY' | 'SELL';
+  tip_transakcije: 'LONG' | 'SHORT';
   kolicina: number;
   cijena: number;
   datum: string;

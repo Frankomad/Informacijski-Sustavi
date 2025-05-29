@@ -1,31 +1,14 @@
 import { Request, Response } from 'express';
-import { supabase } from '../config/supabase.js';
-import { Transaction, transactionSchema, transactionResponseSchema } from '../models/Transaction.js';
+import { TransactionRepository } from '../repositories/transactionRepository.js';
+
+const transactionRepository = new TransactionRepository();
 
 // Get all transactions
 export const getTransactions = async (req: Request, res: Response) => {
   try {
     const { portfolioId } = req.query;
-    let query = supabase
-      .from('transactions')
-      .select(`
-        *,
-        portfolio:portfolios(*),
-        cryptocurrency:cryptocurrencies(*),
-        risk_type:risk_types(*)
-      `)
-      .order('datum', { ascending: false });
-
-    if (portfolioId) {
-      query = query.eq('portfolio_id', portfolioId);
-    }
-
-    const { data, error } = await query;
-
-    if (error) throw error;
-
-    const validatedData = transactionResponseSchema.array().parse(data);
-    res.json(validatedData);
+    const transactions = await transactionRepository.findAll(portfolioId as string);
+    res.json(transactions);
   } catch (error) {
     console.error('Error fetching transactions:', error);
     res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
@@ -35,22 +18,8 @@ export const getTransactions = async (req: Request, res: Response) => {
 // Create a new transaction
 export const createTransaction = async (req: Request, res: Response) => {
   try {
-    const validatedData = transactionSchema.parse(req.body);
-    const { data, error } = await supabase
-      .from('transactions')
-      .insert([validatedData])
-      .select(`
-        *,
-        portfolio:portfolios(*),
-        cryptocurrency:cryptocurrencies(*),
-        risk_type:risk_types(*)
-      `)
-      .single();
-
-    if (error) throw error;
-
-    const validatedResponse = transactionResponseSchema.parse(data);
-    res.status(201).json(validatedResponse);
+    const transaction = await transactionRepository.create(req.body);
+    res.status(201).json(transaction);
   } catch (error) {
     console.error('Error creating transaction:', error);
     if (error instanceof Error) {
@@ -65,13 +34,7 @@ export const createTransaction = async (req: Request, res: Response) => {
 export const deleteTransaction = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { error } = await supabase
-      .from('transactions')
-      .delete()
-      .eq('id', id);
-
-    if (error) throw error;
-
+    await transactionRepository.delete(id);
     res.status(204).send();
   } catch (error) {
     console.error('Error deleting transaction:', error);
@@ -83,19 +46,8 @@ export const deleteTransaction = async (req: Request, res: Response) => {
 export const getTransactionById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { data, error } = await supabase
-      .from('transactions')
-      .select(`
-        *,
-        portfolio:portfolios(*),
-        cryptocurrency:cryptocurrencies(*),
-        risk_type:risk_types(*)
-      `)
-      .eq('id', id)
-      .single();
-    if (error) throw error;
-    const validatedData = transactionResponseSchema.parse(data);
-    res.json(validatedData);
+    const transaction = await transactionRepository.findById(id);
+    res.json(transaction);
   } catch (error) {
     console.error('Error fetching transaction:', error);
     res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
@@ -106,21 +58,8 @@ export const getTransactionById = async (req: Request, res: Response) => {
 export const updateTransaction = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const validatedData = transactionSchema.partial().parse(req.body);
-    const { data, error } = await supabase
-      .from('transactions')
-      .update(validatedData)
-      .eq('id', id)
-      .select(`
-        *,
-        portfolio:portfolios(*),
-        cryptocurrency:cryptocurrencies(*),
-        risk_type:risk_types(*)
-      `)
-      .single();
-    if (error) throw error;
-    const validatedResponse = transactionResponseSchema.parse(data);
-    res.status(200).json(validatedResponse);
+    const transaction = await transactionRepository.update(id, req.body);
+    res.status(200).json(transaction);
   } catch (error) {
     console.error('Error updating transaction:', error);
     if (error instanceof Error) {

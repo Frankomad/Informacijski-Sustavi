@@ -15,7 +15,7 @@ interface TransactionFormProps {
   onSubmit: (data: {
     portfolio_id: string;
     cryptocurrency_id: string;
-    tip_transakcije: 'BUY' | 'SELL';
+    tip_transakcije: 'LONG' | 'SHORT';
     kolicina: number;
     cijena: number;
     datum: string;
@@ -27,7 +27,7 @@ interface TransactionFormProps {
   initialValues?: {
     portfolio_id: string;
     cryptocurrency_id: string;
-    tip_transakcije: 'BUY' | 'SELL';
+    tip_transakcije: 'LONG' | 'SHORT';
     kolicina: number;
     cijena: number;
     datum: string;
@@ -48,7 +48,7 @@ const TransactionForm = ({
   const [selectedPortfolioId, setSelectedPortfolioId] = useState(initialValues?.portfolio_id || defaultPortfolioId || "");
   const [selectedCryptocurrencyId, setSelectedCryptocurrencyId] = useState(initialValues?.cryptocurrency_id || "");
   const [selectedRiskTypeId, setSelectedRiskTypeId] = useState(initialValues?.risk_type_id || "");
-  const [tipTransakcije, setTipTransakcije] = useState<'BUY' | 'SELL'>(initialValues?.tip_transakcije || 'BUY');
+  const [tipTransakcije, setTipTransakcije] = useState<'LONG' | 'SHORT'>(initialValues?.tip_transakcije || 'LONG');
   const [kolicina, setKolicina] = useState(initialValues?.kolicina?.toString() || "");
   const [datum, setDatum] = useState(initialValues?.datum || new Date().toISOString().split('T')[0]);
   const [manualPrice, setManualPrice] = useState(initialValues?.cijena?.toString() || "");
@@ -116,30 +116,19 @@ const TransactionForm = ({
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
-        <Label className="text-base font-medium mb-3 block">Select Portfolio *</Label>
-        <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-          {portfolios.map((portfolio) => (
-            <Card 
-              key={portfolio.id}
-              className={`cursor-pointer transition-all hover:shadow-md ${
-                selectedPortfolioId === portfolio.id ? 'ring-2 ring-primary' : ''
-              }`}
-              onClick={() => setSelectedPortfolioId(portfolio.id)}
-            >
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm">{portfolio.naziv}</CardTitle>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <p className="text-xs text-gray-600 mb-2">
-                  {portfolio.strategija || 'No strategy'}
-                </p>
-                <Badge variant="outline" className="text-xs">
-                  {new Date(portfolio.datum_kreiranja).toLocaleDateString()}
-                </Badge>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <Label htmlFor="portfolio" className="text-base font-medium mb-3 block">Select Portfolio *</Label>
+        <Select value={selectedPortfolioId} onValueChange={setSelectedPortfolioId}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select portfolio" />
+          </SelectTrigger>
+          <SelectContent>
+            {portfolios.map((portfolio) => (
+              <SelectItem key={portfolio.id} value={portfolio.id}>
+                {portfolio.naziv}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <div>
@@ -172,23 +161,23 @@ const TransactionForm = ({
       </div>
 
       <div>
-        <Label className="text-base font-medium mb-3 block">Transaction Type *</Label>
+        <Label className="text-base font-medium mb-3 block">Position Type *</Label>
         <div className="flex gap-3">
           <Button
             type="button"
-            variant={tipTransakcije === 'BUY' ? 'default' : 'outline'}
-            onClick={() => setTipTransakcije('BUY')}
+            variant={tipTransakcije === 'LONG' ? 'default' : 'outline'}
+            onClick={() => setTipTransakcije('LONG')}
             className="flex-1"
           >
-            BUY
+            LONG (Bullish)
           </Button>
           <Button
             type="button"
-            variant={tipTransakcije === 'SELL' ? 'default' : 'outline'}
-            onClick={() => setTipTransakcije('SELL')}
+            variant={tipTransakcije === 'SHORT' ? 'default' : 'outline'}
+            onClick={() => setTipTransakcije('SHORT')}
             className="flex-1"
           >
-            SELL
+            SHORT (Bearish)
           </Button>
         </div>
       </div>
@@ -217,7 +206,7 @@ const TransactionForm = ({
 
       <div className="grid gap-4 md:grid-cols-2">
         <div>
-          <Label htmlFor="kolicina">Quantity *</Label>
+          <Label htmlFor="kolicina">Position Size *</Label>
           <Input
             id="kolicina"
             type="number"
@@ -231,7 +220,7 @@ const TransactionForm = ({
         </div>
         
         <div>
-          <Label htmlFor="datum">Date *</Label>
+          <Label htmlFor="datum">Entry Date *</Label>
           <Input
             id="datum"
             type="date"
@@ -277,7 +266,7 @@ const TransactionForm = ({
           </div>
           {kolicina && (
             <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Total Transaction Value:</span>
+              <span className="text-sm text-gray-600">Position Value:</span>
               <span className="text-lg font-semibold">
                 {formatPrice(getTotalValue())}
               </span>
@@ -288,7 +277,7 @@ const TransactionForm = ({
       
       <div className="flex gap-2 mt-4">
         <Button type="submit" disabled={isLoading || !selectedPortfolioId || !selectedCryptocurrencyId || !selectedRiskTypeId || !kolicina || (forceManualPrice && !manualPrice)}>
-          {isLoading ? (initialValues ? "Saving..." : "Creating...") : initialValues ? "Save Changes" : "Create Transaction"}
+          {isLoading ? (initialValues ? "Saving..." : "Creating...") : initialValues ? "Save Changes" : "Create Position"}
         </Button>
         <Button type="button" variant="outline" onClick={onCancel}>
           Cancel
